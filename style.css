@@ -1,0 +1,42 @@
+section {
+    display: none;
+}
+
+.lobby {
+    display: flex;
+    width: 500px;
+    background-color: antiquewhite;
+}
+
+.player-list {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    text-align: center;
+}
+
+.slots {
+    background-color: antiquewhite;
+    display: flex;
+    flex: 3 3 auto;
+    flex-wrap: wrap;
+}
+
+.row {
+    display: flex;
+    width: 100%;
+}
+
+.lobby-slot {
+    width: 50%;
+    text-align: center;
+    border: 2px solid white;
+}
+
+.blue {
+    color: steelblue
+}
+
+.red {
+    color: crimson
+}

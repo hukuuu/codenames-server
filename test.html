@@ -1,25 +1,65 @@
 <html>
 
 <head>
+    <link rel="stylesheet" href="style.css">
     <script src="//cdn.jsdelivr.net/sockjs/1/sockjs.min.js"></script>
 </head>
 
 <body>
 
-    <section id="choose-name-section">
-      <h1>choose name</h1>
-      <label for="name">Name</label>
-      <input id="name" type="text" name="name" />
-      <button id="name-button">Ok</button>
+    <section id="loading">
+        <h1>loading...</h1>
     </section>
 
-    <section id="choose-session-section" style="display:none;">
-      <h1>choose session</h1>
-      <ul id="sessions">
-        <li>no sessions</li>
-      </ul>
-      <h3>or</h3>
-      <button id="session-button">Create</button>
+    <section id="choose-name-section">
+        <h1>choose name</h1>
+        <label for="name">Name</label>
+        <input id="name" type="text" name="name" />
+        <button id="name-button">Ok</button>
+    </section>
+
+    <section id="choose-session-section">
+        <h1>choose session</h1>
+        <ul id="sessions">
+            <li>no sessions</li>
+        </ul>
+        <h3>or</h3>
+        <button id="session-button">Create</button>
+    </section>
+
+    <section id="lobby">
+        <h1 id="lobby-name">Game</h1>
+        <div>
+            <div class="lobby">
+                <div id="lobby-players" class="player-list">
+                    <h1>players</h1>
+                    <ul  >
+                    </ul>
+                </div>
+                <div class="slots">
+                    <div class="row">
+                        <div id="blue-tell-slot" class="lobby-slot">
+                            <h1 class="blue">tell</h1>
+                            <h1 id="blue-tell-name">[empty]</h1>
+                        </div>
+                        <div id="red-tell-slot" class="lobby-slot">
+                            <h1 class="red">tell</h1>
+                            <h1 id="red-tell-name">[empty]</h1>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div id="blue-guess-slot" class="lobby-slot">
+                            <h1 class="blue">guess</h1>
+                            <h1 id="blue-guess-name">[empty]</h1>
+                        </div>
+                        <div id="red-guess-slot" class="lobby-slot">
+                            <h1 class="red">guess</h1>
+                            <h1 id="red-guess-name">[empty]</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
 
 
