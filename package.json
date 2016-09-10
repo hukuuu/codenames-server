@@ -9,7 +9,12 @@
   "author": "Nikolay Karadzhov <hukuuu@gmail.com> (https://github.com/hukuuu)",
   "license": "ISC",
   "dependencies": {
+    "mout": "^1.0.0",
     "sockjs": "^0.3.17",
     "uuid": "^2.0.2"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.0.2"
   }
 }
