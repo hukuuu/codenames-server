@@ -18,6 +18,7 @@ var chooseNameSection = $('#choose-name-section')
 var chooseSessionSection = $('#choose-session-section')
 var loadingSection = $('#loading')
 var lobbySection = $('#lobby')
+var gameSection = $('#game')
 var sessions = $('#sessions')
 var lobbyPlayers = $('#lobby-players')
 
@@ -25,12 +26,13 @@ var lobbyPlayers = $('#lobby-players')
 var MODES = {
   LOADING: 'loading',
   CHOOSE_NAME: 'choose-name',
-  CHOOSE_SESSION: 'choose-session'
+  CHOOSE_SESSION: 'choose-session',
+  PLAY: 'play'
 }
 
 var state = {
   mode: MODES.LOADING,
-  sessionId: ''
+  session: {}
 }
 
 
@@ -43,6 +45,9 @@ function init() {
 
   $('#session-button')
     .on('click', createSession)
+
+  $('#start-game')
+    .on('click', startGame)
 
   lobbyPlayers
     .on('click', getSlot(''))
@@ -57,6 +62,10 @@ function init() {
 
   update()
 
+}
+
+function startGame() {
+  sock.send(message('startGame', state.session.id))
 }
 
 function getSlot(slot) {
@@ -88,6 +97,10 @@ function handleMessage(msg) {
       break;
     case 'sessionPlayers':
       listSessionPlayers(msg.value)
+      break;
+    case 'gameStarted':
+      state.mode = MODES.PLAY
+      update()
       break;
     default:
       console.log('couldnt handle message: ' + JSON.stringify(msg))
@@ -158,10 +171,21 @@ function update() {
       showLobby()
       break;
 
+    case MODES.PLAY:
+      showGame()
+      break;
+
     default:
       break;
   }
 
+}
+
+function showGame() {
+  hideAll()
+  gameSection.show()
+  $('#game-name')
+    .text('Game ' + state.session.name)
 }
 
 function showLobby() {

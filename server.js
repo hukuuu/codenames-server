@@ -6,6 +6,9 @@ const echo = sockjs.createServer({
 const uuid = require('uuid')
 const util = require('util')
 
+const Game = require('./game/game');
+const generateCards = require('./game/cards-generator');
+
 const players = []
 const sessions = []
 const connections = []
@@ -42,9 +45,7 @@ echo.on('connection', function(conn) {
     broadcastSession(session, (message('sessionPlayers', session.players)))
 
     players.splice(players.indexOf(player), 1)
-    connections.splice(connections.indexOf(connections.filter(function(connection) {
-      return connection.id === player.id
-    })[0]), 1)
+    connections.splice(connections.indexOf(findConnection(player.id)), 1)
   });
 
 });
@@ -52,28 +53,30 @@ echo.on('connection', function(conn) {
 
 
 function handleMessage(player, conn, msg) {
+  let session = null
   switch (msg.type) {
     case 'setName':
       player.name = msg.value
       break;
 
     case 'getSessions':
-      conn.write(message('sessions', sessions))
+      conn.write(message('sessions', stripGame(sessions)))
       break;
 
     case 'createSession':
-      var session = {
+      session = {
         id: uuid.v1(),
         name: 'session' + (sessions.length + 1),
-        players: []
+        players: [],
+        game: getNewGame()
       }
       sessions.push(session)
-      broadcast(connections, message('sessions', sessions))
+      broadcast(connections, message('sessions', stripGame(sessions)))
       break;
 
     case 'joinSession':
       player.currentSessionId = msg.value
-      var session = findSession(msg.value)
+      session = findSession(msg.value)
       session.players.push(player)
       broadcastSession(session, (message('sessionPlayers', session.players)))
       break;
@@ -82,10 +85,23 @@ function handleMessage(player, conn, msg) {
       getSlot(conn, player, findSession(msg.value.sessionId), msg.value.slot)
       break;
 
-    // case 'getSessionPlayers':
-    //   conn.write(message('sessionPlayers', findSession(msg.value)
-    //     .players))
-    //   break;
+    case 'startGame':
+
+      session = findSession(msg.value)
+      broadcastSession(session, (message('gameStarted')))
+      broadcastGameState(session)
+
+      break;
+
+    case 'redTell':
+      session = findSession(msg.value.sessionId)
+      const game = session.game
+      try {
+        game.redTell(msg.value.hint)
+      } catch (e) {
+        conn.write('not your turn')
+      }
+      break;
 
     default:
       console.log('unknown message: ' + JSON.stringify(msg, null, 4))
@@ -93,6 +109,16 @@ function handleMessage(player, conn, msg) {
 
   }
 
+}
+
+function stripGame(sessions) {
+  return sessions.map(
+    s => ({
+      'id': s.id,
+      'name': s.name,
+      'players': s.players
+    })
+  )
 }
 
 function getSlot(conn, player, session, slot) {
@@ -138,4 +164,25 @@ function broadcastSession(session, message) {
   console.log(conns.length)
 
   return broadcast(conns, message)
+}
+
+function getNewGame() {
+  return new Game(generateCards())
+}
+
+function broadcastGameState(session) {
+
+  session.players.forEach(player => {
+    const connection = findConnection(player.id)
+    const method = player.slot.indexOf('guess') > -1 ? 'getGuessState' : 'getTellState'
+    const state = session.game[method]()
+    connection.conn.write(message('gameState', state))
+  })
+
+}
+
+function findConnection(playerId) {
+  return connections.filter(
+    c => c.id === playerId
+  )[0]
 }

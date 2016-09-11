@@ -348,15 +348,73 @@ describe('Game', function() {
       game.redTell('foo')
       game.redGuess(23)
 
-      const winner = game.getState().winner
+      const winner = game.getState()
+        .winner
       assert.equal(winner, 'blue')
     });
 
     it('if assassin hit by blue', function() {
       game.blueTell('foo')
       game.blueGuess(23)
-      const winner = game.getState().winner
+      const winner = game.getState()
+        .winner
       assert.equal(winner, 'red')
+    });
+
+  });
+
+  describe('getTellState', function() {
+
+    describe('all cards', function() {
+
+      it('should have show', function() {
+        const state = game.getTellState()
+        state.cards.forEach(
+          c => {
+            assert.isTrue(c.show)
+          }
+        )
+      });
+
+    });
+
+
+    it('should have the turn', function() {
+      const state = game.getTellState()
+      assert.property(state, 'turn')
+    });
+
+    it('should have the winner', function() {
+      const state = game.getTellState()
+      assert.property(state, 'winner')
+    });
+
+  });
+
+  describe('getGuessState', function() {
+
+    describe('all cards', function() {
+      it('should not have show', function() {
+
+        const state = game.getGuessState()
+          // console.log(state.cards)
+        state.cards.forEach(
+          c => {
+            assert.isTrue(!c.show)
+          }
+        )
+
+      });
+    });
+
+    it('should have the turn', function() {
+      const state = game.getTellState()
+      assert.property(state, 'turn')
+    });
+
+    it('should have the winner', function() {
+      const state = game.getTellState()
+      assert.property(state, 'winner')
     });
 
   });

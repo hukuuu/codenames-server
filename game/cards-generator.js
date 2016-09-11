@@ -6,6 +6,7 @@ const times = (value, times) => {
   return arr
 }
 
+
 const types = times('red', 8)
   .concat(times('blue', 8))
   .concat(times('neutral', 7))
@@ -16,6 +17,7 @@ const generate = () => {
   const cards = types.concat(!!Math.round(Math.random() * 1) ? 'red' : 'blue')
     .map(type => {
       return {
+        text: "random",
         type: type,
         pos: i++,
         revealed: false,

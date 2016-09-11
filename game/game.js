@@ -1,4 +1,5 @@
 var shuffle = require('mout/array/shuffle')
+var mixin = require('mout/object/mixIn')
 
 const red = 'red'
 const blue = 'blue'
@@ -14,6 +15,38 @@ class Game {
     this.turn = initialState.turn
     this.first = initialState.first
     this.winner = false
+  }
+
+  getTellState() {
+    const cards = this.cards.map(
+      c => ({
+        text: c.text,
+        pos: c.pos,
+        revealed: c.revealed,
+        type: c.type,
+        show: true
+      }))
+
+    return {
+      cards,
+      turn: this.turn,
+      winner: this.winner
+    }
+  }
+
+  getGuessState() {
+    const cards = this.cards.map(
+      c => ({
+        text: c.text,
+        pos: c.pos,
+        revealed: c.revealed,
+        type: c.revealed ? c.type : undefined
+      }))
+    return {
+      cards,
+      turn: this.turn,
+      winner: this.winner
+    }
   }
 
   getState() {
