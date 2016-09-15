@@ -41,8 +41,10 @@ echo.on('connection', function(conn) {
     console.log('close???')
     console.log(player.currentSessionId)
     var session = findSession(player.currentSessionId)
-    session.players.splice(session.players.indexOf(player), 1)
-    broadcastSession(session, (message('sessionPlayers', session.players)))
+    if(session) {
+      session.players.splice(session.players.indexOf(player), 1)
+      broadcastSession(session, (message('sessionPlayers', session.players)))
+    }
 
     players.splice(players.indexOf(player), 1)
     connections.splice(connections.indexOf(findConnection(player.id)), 1)
@@ -57,6 +59,7 @@ function handleMessage(player, conn, msg) {
   switch (msg.type) {
     case 'setName':
       player.name = msg.value
+      conn.write(message('sessions', stripGame(sessions)))
       break;
 
     case 'getSessions':
@@ -92,6 +95,12 @@ function handleMessage(player, conn, msg) {
       broadcastGameState(session)
 
       break;
+    //
+    // case 'redHint':
+    //   session = findSession(msg.value.sessionId)
+    //   session.game.redHint(msg.value.hint)
+    //   broadcastGameState(session)
+    //   break;
 
     case 'redTell':
       session = findSession(msg.value.sessionId)

@@ -1,4 +1,5 @@
 const shuffle = require('mout/array/shuffle');
+const words = require('./words.json').words
 const times = (value, times) => {
   const arr = []
   while (times--)
@@ -7,21 +8,24 @@ const times = (value, times) => {
 }
 
 
+
 const types = times('red', 8)
   .concat(times('blue', 8))
   .concat(times('neutral', 7))
   .concat('assassin')
 
 const generate = () => {
+
+  const shuffled = shuffle(words)
+
   let i = 0
   const cards = types.concat(!!Math.round(Math.random() * 1) ? 'red' : 'blue')
     .map(type => {
       return {
-        text: "random",
+        text: shuffled[i],
         type: type,
         pos: i++,
-        revealed: false,
-        show: false
+        revealed: false
       }
     })
 

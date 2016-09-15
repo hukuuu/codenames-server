@@ -23,14 +23,14 @@ class Game {
         text: c.text,
         pos: c.pos,
         revealed: c.revealed,
-        type: c.type,
-        show: true
+        type: c.type
       }))
 
     return {
       cards,
       turn: this.turn,
-      winner: this.winner
+      winner: this.winner,
+      show:true
     }
   }
 
