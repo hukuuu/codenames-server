@@ -16,100 +16,129 @@ class Game {
     this.turn = initialState.turn
     this.first = initialState.first
     this.winner = false
-
+    this.log = []
     this.redTurnCount = 0
     this.blueTurnCount = 0
   }
 
   getTellState() {
-    const cards = this.cards.map(
-      c => ({
-        text: c.text,
-        pos: c.pos,
-        revealed: c.revealed,
-        type: c.type
-      }))
-
-    return {
-      cards,
-      blueHint: this.blueHint,
-      redHint: this.redHint,
-      turn: this.turn,
-      winner: this.winner,
-      show:true
-    }
+    return this._getState()
   }
 
   getGuessState() {
-    const cards = this.cards.map(
+    const state = this._getState()
+    state.cards = this.cards.map(
       c => ({
         text: c.text,
         pos: c.pos,
         revealed: c.revealed,
         type: c.revealed ? c.type : undefined
       }))
-    return {
-      cards,
-      blueHint: this.blueHint,
-      redHint: this.redHint,
-      turn: this.turn,
-      winner: this.winner
-    }
+    return state
   }
 
-  getState() {
-    return {
-      cards: this.cards,
-      turn: this.turn,
-      winner: this.winner
-    }
-  }
-
-  redTell(hint) {
-    this._tryThrow('red-tell')
+  redTell(player, hint) {
+    this._validateGameTurn('red-tell')
+    this._validatePlayerTurn(player)
     this.redHint = hint
     this.redTurnCount = this._getCountValue(hint.count)
+    this.log.push({
+      timestamp: Date.now(),
+      player: player,
+      hint: hint
+    })
     this.turn = 'red-guess'
   }
 
-  blueTell(hint) {
-    this._tryThrow('blue-tell')
+  blueTell(player, hint) {
+    this._validateGameTurn('blue-tell')
+    this._validatePlayerTurn(player)
     this.blueHint = hint
     this.blueTurnCount = this._getCountValue(hint.count)
+    this.log.push({
+      timestamp: Date.now(),
+      player: player,
+      hint: hint
+    })
     this.turn = 'blue-guess'
   }
 
-  redGuess(pos) {
-    this._tryThrow('red-guess')
+  redGuess(player, pos) {
+    this._validateGameTurn('red-guess')
+    this._validatePlayerTurn(player)
     this._revealCard(pos)
+    this.log.push({
+      timestamp: Date.now(),
+      player: player,
+      card: this._findCard(pos)
+    })
     this._computeWinner()
 
     this.redTurnCount--
 
-    if(this._findCard(pos).type !== 'red' || this.redTurnCount === 0)
-      this.turn = 'blue-tell'
+      if (this._findCard(pos)
+        .type !== 'red' || this.redTurnCount === 0)
+        this.turn = 'blue-tell'
   }
 
-  blueGuess(pos) {
-    this._tryThrow('blue-guess')
+  blueGuess(player, pos) {
+    this._validateGameTurn('blue-guess')
+    this._validatePlayerTurn(player)
     this._revealCard(pos)
+    this.log.push({
+      timestamp: Date.now(),
+      player: player,
+      card: this._findCard(pos)
+    })
     this._computeWinner()
 
     this.blueTurnCount--
 
-    if(this._findCard(pos).type !== 'blue' || this.blueTurnCount === 0)
-      this.turn = 'red-tell'
+      if (this._findCard(pos)
+        .type !== 'blue' || this.blueTurnCount === 0)
+        this.turn = 'red-tell'
   }
 
-  pass() {
-    if(this.turn === 'blue-guess')
+  pass(player) {
+    this._validateGameTurn('blue-guess', 'red-guess')
+    this._validatePlayerTurn(player)
+    if (this.turn === 'blue-guess')
       this.turn = 'red-tell'
-    if(this.turn === 'red-guess')
+    if (this.turn === 'red-guess')
       this.turn = 'blue-tell'
   }
 
+  _getState() {
+    return {
+      cards: this.cards,
+      turn: this.turn,
+      winner: this.winner,
+      blueHint: this.blueHint,
+      redHint: this.redHint,
+      log: this.log
+    }
+  }
+
+  _validatePlayerTurn(player) {
+    if (player.slot !== this.turn)
+      throw new Error(`Not your turn, ${player.name}...`)
+  }
+  _validateGameTurn() {
+    let safe = false
+    const turn = this.turn
+    console.log('game turn:', turn);
+    [].forEach.call(arguments, function(action) {
+      console.log('action:', action)
+      if (turn == action)
+        safe = true
+    })
+    if (!safe) {
+      throw new Error(`Invalid state: game turn is ${this.turn}`)
+    }
+  }
+
   _getCountValue(count) {
-    if(count === 'infinity' || count === 0)
+    if (count === 'infinity' || count === 0)
       return 0
     return count + 1
   }
@@ -172,15 +201,6 @@ class Game {
       card.revealed = true
     }
 
-  }
-
-  _tryThrow(expected) {
-    if (this.turn !== expected)
-      throw new Error(
-        'illegal state' +
-        ' you tried: ' + expected +
-        ' but turn is: ' + this.turn
-      )
   }
 
   _findCard(pos) {

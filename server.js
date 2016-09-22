@@ -97,19 +97,19 @@ function handleMessage(player, conn, msg) {
       break;
 
     case 'redTell':
-      play(conn, msg)
+      play(player, conn, msg)
       break;
 
     case 'blueTell':
-      play(conn, msg)
+      play(player, conn, msg)
       break;
 
     case 'redGuess':
-      play(conn, msg)
+      play(player, conn, msg)
       break;
 
     case 'blueGuess':
-      play(conn, msg)
+      play(player, conn, msg)
       break;
 
     case 'pass':
@@ -126,17 +126,17 @@ function handleMessage(player, conn, msg) {
 
 function pass(player) {
   const session =  findSession(player.currentSessionId)
-  session.game.pass()
+  session.game.pass(player)
   broadcastGameState(session)
 }
 
-function play(conn, msg) {
+function play(player, conn, msg) {
   const session = findSession(msg.value.sessionId)
   try {
-    session.game[msg.type](msg.value.value)
+    session.game[msg.type](player, msg.value.value)
     broadcastGameState(session)
   } catch (e) {
-    conn.write(e)
+    conn.write(message('error',e.message))
   }
 }
 
