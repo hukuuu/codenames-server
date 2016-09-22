@@ -1,3 +1,4 @@
+'use strict';
 var shuffle = require('mout/array/shuffle')
 var mixin = require('mout/object/mixIn')
 
@@ -15,6 +16,9 @@ class Game {
     this.turn = initialState.turn
     this.first = initialState.first
     this.winner = false
+
+    this.redTurnCount = 0
+    this.blueTurnCount = 0
   }
 
   getTellState() {
@@ -28,6 +32,8 @@ class Game {
 
     return {
       cards,
+      blueHint: this.blueHint,
+      redHint: this.redHint,
       turn: this.turn,
       winner: this.winner,
       show:true
@@ -44,6 +50,8 @@ class Game {
       }))
     return {
       cards,
+      blueHint: this.blueHint,
+      redHint: this.redHint,
       turn: this.turn,
       winner: this.winner
     }
@@ -53,36 +61,57 @@ class Game {
     return {
       cards: this.cards,
       turn: this.turn,
-      blueHint: this.blueHint,
-      redHint: this.redHint,
       winner: this.winner
     }
   }
 
   redTell(hint) {
-    this._tryThrow('red tell')
+    this._tryThrow('red-tell')
     this.redHint = hint
-    this.turn = 'red guess'
+    this.redTurnCount = this._getCountValue(hint.count)
+    this.turn = 'red-guess'
   }
 
   blueTell(hint) {
-    this._tryThrow('blue tell')
+    this._tryThrow('blue-tell')
     this.blueHint = hint
-    this.turn = 'blue guess'
+    this.blueTurnCount = this._getCountValue(hint.count)
+    this.turn = 'blue-guess'
   }
 
   redGuess(pos) {
-    this._tryThrow('red guess')
+    this._tryThrow('red-guess')
     this._revealCard(pos)
     this._computeWinner()
-    this.turn = 'blue tell'
+
+    this.redTurnCount--
+
+    if(this._findCard(pos).type !== 'red' || this.redTurnCount === 0)
+      this.turn = 'blue-tell'
   }
 
   blueGuess(pos) {
-    this._tryThrow('blue guess')
+    this._tryThrow('blue-guess')
     this._revealCard(pos)
     this._computeWinner()
-    this.turn = 'red tell'
+
+    this.blueTurnCount--
+
+    if(this._findCard(pos).type !== 'blue' || this.blueTurnCount === 0)
+      this.turn = 'red-tell'
+  }
+
+  pass() {
+    if(this.turn === 'blue-guess')
+      this.turn = 'red-tell'
+    if(this.turn === 'red-guess')
+      this.turn = 'blue-tell'
+  }
+
+  _getCountValue(count) {
+    if(count === 'infinity' || count === 0)
+      return 0
+    return count + 1
   }
 
   _computeWinner() {
@@ -105,7 +134,7 @@ class Game {
     })
 
     if (assassins === 1) {
-      this.winner = this.turn === 'blue guess' ? 'red' : 'blue'
+      this.winner = this.turn === 'blue-guess' ? 'red' : 'blue'
       return
     }
 
@@ -165,12 +194,12 @@ class Game {
       .length
     if (redCards === 9)
       return {
-        turn: 'red tell',
+        turn: 'red-tell',
         first: 'red'
       }
     else
       return {
-        turn: 'blue tell',
+        turn: 'blue-tell',
         first: 'blue'
       }
   }

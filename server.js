@@ -41,7 +41,7 @@ echo.on('connection', function(conn) {
     console.log('close???')
     console.log(player.currentSessionId)
     var session = findSession(player.currentSessionId)
-    if(session) {
+    if (session) {
       session.players.splice(session.players.indexOf(player), 1)
       broadcastSession(session, (message('sessionPlayers', session.players)))
     }
@@ -95,21 +95,25 @@ function handleMessage(player, conn, msg) {
       broadcastGameState(session)
 
       break;
-    //
-    // case 'redHint':
-    //   session = findSession(msg.value.sessionId)
-    //   session.game.redHint(msg.value.hint)
-    //   broadcastGameState(session)
-    //   break;
 
     case 'redTell':
-      session = findSession(msg.value.sessionId)
-      const game = session.game
-      try {
-        game.redTell(msg.value.hint)
-      } catch (e) {
-        conn.write('not your turn')
-      }
+      play(conn, msg)
+      break;
+
+    case 'blueTell':
+      play(conn, msg)
+      break;
+
+    case 'redGuess':
+      play(conn, msg)
+      break;
+
+    case 'blueGuess':
+      play(conn, msg)
+      break;
+
+    case 'pass':
+      pass(player)
       break;
 
     default:
@@ -118,6 +122,22 @@ function handleMessage(player, conn, msg) {
 
   }
 
+}
+
+function pass(player) {
+  const session =  findSession(player.currentSessionId)
+  session.game.pass()
+  broadcastGameState(session)
+}
+
+function play(conn, msg) {
+  const session = findSession(msg.value.sessionId)
+  try {
+    session.game[msg.type](msg.value.value)
+    broadcastGameState(session)
+  } catch (e) {
+    conn.write(e)
+  }
 }
 
 function stripGame(sessions) {
