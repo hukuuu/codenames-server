@@ -1,3 +1,4 @@
+'use strict';
 const shuffle = require('mout/array/shuffle');
 const words = require('./words.json').words
 const times = (value, times) => {

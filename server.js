@@ -1,3 +1,4 @@
+'use strict';
 const http = require('http');
 const sockjs = require('sockjs');
 const echo = sockjs.createServer({
