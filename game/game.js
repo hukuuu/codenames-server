@@ -115,7 +115,8 @@ class Game {
       winner: this.winner,
       blueHint: this.blueHint,
       redHint: this.redHint,
-      log: this.log
+      log: this.log,
+      first: this.first
     }
   }
 
