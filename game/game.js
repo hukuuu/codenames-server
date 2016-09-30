@@ -42,11 +42,7 @@ class Game {
     this._validatePlayerTurn(player)
     this.redHint = hint
     this.redTurnCount = this._getCountValue(hint.count)
-    this.log.push({
-      timestamp: Date.now(),
-      player: player,
-      hint: hint
-    })
+    this._logTell(player, hint)
     this.turn = 'red-guess'
   }
 
@@ -55,11 +51,7 @@ class Game {
     this._validatePlayerTurn(player)
     this.blueHint = hint
     this.blueTurnCount = this._getCountValue(hint.count)
-    this.log.push({
-      timestamp: Date.now(),
-      player: player,
-      hint: hint
-    })
+    this._logTell(player, hint)
     this.turn = 'blue-guess'
   }
 
@@ -67,11 +59,7 @@ class Game {
     this._validateGameTurn('red-guess')
     this._validatePlayerTurn(player)
     this._revealCard(pos)
-    this.log.push({
-      timestamp: Date.now(),
-      player: player,
-      card: this._findCard(pos)
-    })
+    this.log.push(player, this._findCard(pos))
     this._computeWinner()
 
     this.redTurnCount--
@@ -85,11 +73,7 @@ class Game {
     this._validateGameTurn('blue-guess')
     this._validatePlayerTurn(player)
     this._revealCard(pos)
-    this.log.push({
-      timestamp: Date.now(),
-      player: player,
-      card: this._findCard(pos)
-    })
+    this.log.push(player, this._findCard(pos))
     this._computeWinner()
 
     this.blueTurnCount--
@@ -102,6 +86,7 @@ class Game {
   pass(player) {
     this._validateGameTurn('blue-guess', 'red-guess')
     this._validatePlayerTurn(player)
+    this._logPass(player)
     if (this.turn === 'blue-guess')
       this.turn = 'red-tell'
     if (this.turn === 'red-guess')
@@ -223,6 +208,30 @@ class Game {
         turn: 'blue-tell',
         first: 'blue'
       }
+  }
+
+  _logPass(player) {
+    this.log.push({
+      action: 'pass',
+      timestamp: Date.now(),
+      player: player
+    })
+  }
+  _logGuess(player, card) {
+    this.log.push({
+      action: 'guess',
+      timestamp: Date.now(),
+      player: player,
+      card: card
+    })
+  }
+  _logTell(player, hint) {
+    this.log.push({
+      action: 'hint',
+      timestamp: Date.now(),
+      player: player,
+      hint: hint
+    })
   }
 
 }

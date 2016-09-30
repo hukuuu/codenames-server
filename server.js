@@ -129,7 +129,7 @@ function handleMessage(player, conn, msg) {
 }
 
 function pass(player) {
-  const session =  findSession(player.currentSessionId)
+  const session = findSession(player.currentSessionId)
   session.game.pass(player)
   broadcastGameState(session)
 }
@@ -140,7 +140,7 @@ function play(player, conn, msg) {
     session.game[msg.type](player, msg.value.value)
     broadcastGameState(session)
   } catch (e) {
-    conn.write(message('error',e.message))
+    conn.write(message('error', e.message))
   }
 }
 
