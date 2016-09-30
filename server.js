@@ -44,7 +44,10 @@ echo.on('connection', function(conn) {
     var session = findSession(player.currentSessionId)
     if (session) {
       session.players.splice(session.players.indexOf(player), 1)
-      broadcastSession(session, (message('sessionPlayers', session.players)))
+      if (session.players.length)
+        broadcastSession(session, (message('sessionPlayers', session.players)))
+      else
+        sessions.splice(sessions.indexOf(session), 1)
     }
 
     players.splice(players.indexOf(player), 1)
