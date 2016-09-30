@@ -59,7 +59,7 @@ class Game {
     this._validateGameTurn('red-guess')
     this._validatePlayerTurn(player)
     this._revealCard(pos)
-    this.log.push(player, this._findCard(pos))
+    this._logGuess(player, this._findCard(pos))
     this._computeWinner()
 
     this.redTurnCount--
@@ -73,7 +73,7 @@ class Game {
     this._validateGameTurn('blue-guess')
     this._validatePlayerTurn(player)
     this._revealCard(pos)
-    this.log.push(player, this._findCard(pos))
+    this._logGuess(player, this._findCard(pos))
     this._computeWinner()
 
     this.blueTurnCount--
