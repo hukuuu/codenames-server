@@ -20,7 +20,7 @@ const generate = () => {
   const shuffled = shuffle(words)
 
   let i = 0
-  const cards = types.concat(!!Math.round(Math.random() * 1) ? 'red' : 'blue')
+  const cards = types.concat(Math.random() >= 0.5 ? 'red' : 'blue')
     .map(type => {
       return {
         text: shuffled[i],
