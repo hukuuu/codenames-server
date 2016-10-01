@@ -27,13 +27,14 @@ class Game {
 
   getGuessState() {
     const state = this._getState()
-    state.cards = this.cards.map(
-      c => ({
-        text: c.text,
-        pos: c.pos,
-        revealed: c.revealed,
-        type: c.revealed ? c.type : undefined
-      }))
+    if(!this.winner)
+      state.cards = this.cards.map(
+        c => ({
+          text: c.text,
+          pos: c.pos,
+          revealed: c.revealed,
+          type: c.revealed ? c.type : undefined
+        }))
     return state
   }
 
