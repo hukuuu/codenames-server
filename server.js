@@ -46,8 +46,10 @@ echo.on('connection', function(conn) {
       session.players.splice(session.players.indexOf(player), 1)
       if (session.players.length)
         broadcastSession(session, (message('sessionPlayers', session.players)))
-      else
+      else {
         sessions.splice(sessions.indexOf(session), 1)
+        broadcast(connections, message('sessions', stripGame(sessions)))
+      }
     }
 
     players.splice(players.indexOf(player), 1)
@@ -206,10 +208,12 @@ function getNewGame() {
 function broadcastGameState(session) {
 
   session.players.forEach(player => {
-    const connection = findConnection(player.id)
-    const method = player.slot.indexOf('guess') > -1 ? 'getGuessState' : 'getTellState'
-    const state = session.game[method]()
-    connection.conn.write(message('gameState', state))
+    if(player.slot) {
+      const connection = findConnection(player.id)
+      const method = player.slot.indexOf('guess') > -1 ? 'getGuessState' : 'getTellState'
+      const state = session.game[method]()
+      connection.conn.write(message('gameState', state))
+    }
   })
 
 }

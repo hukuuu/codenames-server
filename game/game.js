@@ -27,7 +27,7 @@ class Game {
 
   getGuessState() {
     const state = this._getState()
-    if(!this.winner)
+    if (!this.winner)
       state.cards = this.cards.map(
         c => ({
           text: c.text,
@@ -110,6 +110,7 @@ class Game {
     if (player.slot !== this.turn)
       throw new Error(`Not your turn, ${player.name}...`)
   }
+  
   _validateGameTurn() {
     let safe = false
     const turn = this.turn
