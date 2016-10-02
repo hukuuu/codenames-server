@@ -17,8 +17,12 @@ class Game {
     this.first = initialState.first
     this.winner = false
     this.log = []
-    this.redTurnCount = 0
-    this.blueTurnCount = 0
+    this.blueHint = {
+      left: 0
+    }
+    this.redHint = {
+      left: 0
+    }
   }
 
   getTellState() {
@@ -42,7 +46,7 @@ class Game {
     this._validateGameTurn('red-tell')
     this._validatePlayerTurn(player)
     this.redHint = hint
-    this.redTurnCount = this._getCountValue(hint.count)
+    this.redHint.left = this._getCountValue(hint.count)
     this._logTell(player, hint)
     this.turn = 'red-guess'
   }
@@ -51,7 +55,7 @@ class Game {
     this._validateGameTurn('blue-tell')
     this._validatePlayerTurn(player)
     this.blueHint = hint
-    this.blueTurnCount = this._getCountValue(hint.count)
+    this.blueHint.left = this._getCountValue(hint.count)
     this._logTell(player, hint)
     this.turn = 'blue-guess'
   }
@@ -63,10 +67,10 @@ class Game {
     this._logGuess(player, this._findCard(pos))
     this._computeWinner()
 
-    this.redTurnCount--
+    this.redHint.left--
 
       if (this._findCard(pos)
-        .type !== 'red' || this.redTurnCount === 0)
+        .type !== 'red' || this.redHint.left === 0)
         this.turn = 'blue-tell'
   }
 
@@ -77,10 +81,10 @@ class Game {
     this._logGuess(player, this._findCard(pos))
     this._computeWinner()
 
-    this.blueTurnCount--
+    this.blueHint.left--
 
       if (this._findCard(pos)
-        .type !== 'blue' || this.blueTurnCount === 0)
+        .type !== 'blue' || this.blueHint.left === 0)
         this.turn = 'red-tell'
   }
 
@@ -110,7 +114,7 @@ class Game {
     if (player.slot !== this.turn)
       throw new Error(`Not your turn, ${player.name}...`)
   }
-  
+
   _validateGameTurn() {
     let safe = false
     const turn = this.turn

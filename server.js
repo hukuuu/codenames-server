@@ -14,6 +14,8 @@ const players = []
 const sessions = []
 const connections = []
 
+require('./staticServer') //TODO comment when developing...
+
 const server = http.createServer();
 echo.installHandlers(server, {
   prefix: '/echo'

@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "mout": "^1.0.0",
+    "node-static": "^0.7.9",
     "sockjs": "^0.3.17",
     "uuid": "^2.0.2"
   },
