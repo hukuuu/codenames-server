@@ -14,8 +14,9 @@ const players = []
 const sessions = []
 const connections = []
 
-if(process.env.NODE_ENV = 'production')
+if(process.env.NODE_ENV === 'production') {
   require('./staticServer')
+}
 
 const server = http.createServer();
 echo.installHandlers(server, {
