@@ -81,6 +81,7 @@ function handleMessage(player, conn, msg) {
         id: uuid.v1(),
         name: 'session' + (sessions.length + 1),
         players: [],
+        chat: [],
         game: getNewGame()
       }
       sessions.push(session)
@@ -126,12 +127,26 @@ function handleMessage(player, conn, msg) {
       pass(player)
       break;
 
+    case 'chatMessage':
+      appendChatMessage(msg.value)
+
     default:
       console.log('unknown message: ' + JSON.stringify(msg, null, 4))
       break;
 
   }
 
+}
+
+function appendChatMessage(chatMessage) {
+  const session = findSession(chatMessage.sessionId)
+  session.chat.push({
+    timestamp: Date.now(),
+    message: chatMessage.message,
+    from: chatMessage.from
+  })
+
+  broadcastSession(session, (message('chatMessage', session.chat)))
 }
 
 function pass(player) {
@@ -153,9 +168,10 @@ function play(player, conn, msg) {
 function stripGame(sessions) {
   return sessions.map(
     s => ({
-      'id': s.id,
-      'name': s.name,
-      'players': s.players
+      id: s.id,
+      name: s.name,
+      players: s.players,
+      chat: s.chat
     })
   )
 }
@@ -214,9 +230,11 @@ function broadcastGameState(session) {
   session.players.forEach(player => {
     if(player.slot) {
       const connection = findConnection(player.id)
-      const method = player.slot.indexOf('guess') > -1 ? 'getGuessState' : 'getTellState'
-      const state = session.game[method]()
-      connection.conn.write(message('gameState', state))
+      if(connection && connection.conn) {
+        const method = player.slot.indexOf('guess') > -1 ? 'getGuessState' : 'getTellState'
+        const state = session.game[method]()
+        connection.conn.write(message('gameState', state))
+      }
     }
   })
 
